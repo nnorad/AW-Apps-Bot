@@ -30,8 +30,6 @@ module.exports = {
 								const messages = [message]
 								const result = await suggestionSchema.findOne({ messageId: messages[0].id })
 
-								console.log(result)
-
 								if (user.id !== result.userId) return await interaction.reply({ content: 'You cannot delete this suggestion.', ephemeral: true })
 								if (result.status !== 'NO_STATUS') return await interaction.reply({ content: 'This suggestion cannot be deleted.', ephemeral: true })
 
