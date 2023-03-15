@@ -91,6 +91,10 @@ module.exports = {
                     new ActionRowBuilder()
                         .addComponents(
                             new ButtonBuilder()
+                                .setCustomId('suggestion_channel_cancel')
+                                .setLabel('Cancel')
+                                .setStyle(ButtonStyle.Secondary),
+                            new ButtonBuilder()
                                 .setCustomId('suggestion_channel_disable')
                                 .setLabel('Disable Suggestions')
                                 .setDisabled(result?.suggestionChannelId ? false : true)
@@ -112,6 +116,10 @@ module.exports = {
 
                                 await guildSchema.updateOne({ guildId }, { suggestionChannelId: channel.id }, { upsert: true })
                                 await i.update({ content: `Suggestions will now be sent to ${channel}.`, components, ephemeral: true })
+                                break
+                            }
+                            case 'suggestion_channel_cancel': {
+                                await i.update({ components })
                                 break
                             }
                             case 'suggestion_channel_disable': {
