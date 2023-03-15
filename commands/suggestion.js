@@ -121,7 +121,7 @@ module.exports = {
                             }
                         }
                     }).catch(async () => {
-                        await interaction.editReply({ content: 'No changes were made.', components: [] })
+                        await interaction.editReply({ components })
                     })
                 break
             }
