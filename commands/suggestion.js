@@ -104,7 +104,7 @@ module.exports = {
 
                 const message = await interaction.reply({ content: result?.suggestionChannelId ? `Suggestions are being sent to <#${result.suggestionChannelId}>.` : null, components, ephemeral: true })
 
-                components.forEach((c) => c.components[0].data.disabled = true)
+                components.forEach((row) => row.components.forEach((component) => component.data.disabled = true))
 
                 await message.awaitMessageComponent({ time: 30000 })
                     .then(async (i) => {
