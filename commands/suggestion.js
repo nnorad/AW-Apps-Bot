@@ -102,7 +102,7 @@ module.exports = {
                         )
                 ]
 
-                const message = await interaction.reply({ content: result?.suggestionChannelId ? `Suggestions are being sent to <#${result.suggestionChannelId}>.` : null, components, ephemeral: true })
+                const message = await interaction.reply({ content: result?.suggestionChannelId ? `The suggestion channel is set to <#${result.suggestionChannelId}>.` : null, components, ephemeral: true })
 
                 components.forEach((row) => row.components.forEach((component) => component.data.disabled = true))
 
@@ -112,10 +112,10 @@ module.exports = {
                             case 'suggestion_channel_select': {
                                 const channel = i.channels.first()
 
-                                if (channel.id === result?.suggestionChannelId) return await i.update({ content: `Suggestions are already being sent to ${channel}.`, components, ephemeral: true })
+                                if (channel.id === result?.suggestionChannelId) return await i.update({ content: `The suggestion channel is already set to ${channel}.`, components, ephemeral: true })
 
                                 await guildSchema.updateOne({ guildId }, { suggestionChannelId: channel.id }, { upsert: true })
-                                await i.update({ content: `Suggestions will now be sent to ${channel}.`, components, ephemeral: true })
+                                await i.update({ content: `The suggestion channel has been set to ${channel}.`, components, ephemeral: true })
                                 break
                             }
                             case 'suggestion_channel_cancel': {
@@ -124,7 +124,7 @@ module.exports = {
                             }
                             case 'suggestion_channel_disable': {
                                 await guildSchema.updateOne({ guildId }, { $unset: { suggestionChannelId: '' } })
-                                await i.update({ content: `Suggestions have been disabled.`, components, ephemeral: true })
+                                await i.update({ content: `The suggestion channel has been disabled.`, components, ephemeral: true })
                                 break
                             }
                         }
