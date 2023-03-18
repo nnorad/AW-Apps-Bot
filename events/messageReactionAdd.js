@@ -10,7 +10,7 @@ module.exports = {
 
         if (result?.status !== 'NO_STATUS') return
         
-        const { client, message } = reaction
+        const { message } = reaction
 
         await message.fetch()
         
