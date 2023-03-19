@@ -9,7 +9,7 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
 	async execute(interaction) {
-        const { guildId } = interaction
+        const { client, guild, guildId } = interaction
         const result = await guildSchema.findOne({ guildId })
 
         const components = [
@@ -45,6 +45,17 @@ module.exports = {
                         const channel = i.channels.first()
 
                         if (channel.id === result?.reactionChannelId) return await i.update({ content: `The reaction channel is already set to ${channel}.`, components, ephemeral: true })
+                        if (!channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) return await i.update({ content: `Please grant me the Manage Webhooks permission for ${channel}.`, components, ephemeral: true })
+
+                        let webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
+
+                        if (webhook) {
+                            if (!webhook.channelId !== channel.id) await webhook.edit({ channel: channel.id })
+                        } else {
+                            webhook = await channel.createWebhook({ name: client.user.username, avatar: client.user.displayAvatarURL({ extension: 'png', size: 4096 }) })
+
+                            await guildSchema.updateOne({ guildId }, { guildId, reactionChannelWebhookId: webhook.id, reactionChannelWebhookToken: webhook.token }, { upsert: true })
+                        }
 
                         await guildSchema.updateOne({ guildId }, { reactionChannelId: channel.id }, { upsert: true })
                         await i.update({ content: `The reaction channel has been set to ${channel}.`, components, ephemeral: true })
@@ -55,12 +66,21 @@ module.exports = {
                         break
                     }
                     case 'reaction_channel_disable': {
+                        const webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
+
+                        if (webhook) {
+                            if (webhook.channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) await webhook.delete()
+
+                            await guildSchema.updateOne({ guildId }, { $unset: { reactionChannelWebhookId: '', reactionChannelWebhookToken: '' } })
+                        }
+                        
                         await guildSchema.updateOne({ guildId }, { $unset: { reactionChannelId: '' } })
                         await i.update({ content: `The reaction channel has been disabled.`, components, ephemeral: true })
                         break
                     }
                 }
-            }).catch(async () => {
+            }).catch(async (e) => {
+                console.log(e)
                 await interaction.editReply({ components })
             })
     },

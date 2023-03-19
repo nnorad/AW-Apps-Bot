@@ -4,7 +4,9 @@ const guildSchema = mongoose.Schema({
     guildId: String,
     suggestionChannelId: String,
     suggestionId: Number,
-    reactionChannelId: String
+    reactionChannelId: String,
+    reactionChannelWebhookId: String,
+    reactionChannelWebhookToken: String
 })
 
 module.exports = mongoose.model('guilds', guildSchema)
