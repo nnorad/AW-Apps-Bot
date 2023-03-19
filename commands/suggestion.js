@@ -96,7 +96,7 @@ module.exports = {
                                 .setStyle(ButtonStyle.Secondary),
                             new ButtonBuilder()
                                 .setCustomId('suggestion_channel_disable')
-                                .setLabel('Disable Suggestions')
+                                .setLabel('Disable')
                                 .setDisabled(result?.suggestionChannelId ? false : true)
                                 .setStyle(ButtonStyle.Danger)
                         )
