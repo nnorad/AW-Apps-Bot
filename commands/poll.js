@@ -15,6 +15,6 @@ module.exports = {
 
         await message.react('<:yes:1084332973870026892>')
         await message.react('<:no:1084332972683051068>')
-        await interaction.reply({ content: 'Done!', ephemeral: true })
+        await interaction.reply({ content: 'Done.', ephemeral: true })
     },
 }
