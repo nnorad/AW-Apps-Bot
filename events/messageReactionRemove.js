@@ -10,7 +10,7 @@ module.exports = {
         const { client, emoji, message } = reaction
         const result = await suggestionSchema.findOne({ messageId: message.id })
 
-        if (result && result?.status !== 'NO_STATUS') {
+        if (result && result?.status === 'NO_STATUS') {
             await message.fetch()
             
             const { editable, embeds, channel, guild, reactions } = message
