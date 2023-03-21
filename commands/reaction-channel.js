@@ -1,11 +1,10 @@
 const { SlashCommandBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, ChannelSelectMenuBuilder, ChannelType } = require('discord.js');
 const guildSchema = require('../schemas/guild-schema')
-const suggestionSchema = require('../schemas/suggestion-schema')
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('reaction-channel')
-		.setDescription('Set the reaction channel.')
+		.setName('reaction-log')
+		.setDescription('Set the channel to which reactions will be logged.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
 	async execute(interaction) {
@@ -34,7 +33,7 @@ module.exports = {
                 )
         ]
 
-        const message = await interaction.reply({ content: result?.reactionChannelId ? `The reaction channel is set to <#${result.reactionChannelId}>.` : null, components, ephemeral: true })
+        const message = await interaction.reply({ content: result?.reactionChannelId ? `Reaction Log: <#${result.reactionChannelId}>` : null, components, ephemeral: true })
 
         components.forEach((row) => row.components.forEach((component) => component.data.disabled = true))
 
@@ -44,7 +43,7 @@ module.exports = {
                     case 'reaction_channel_select': {
                         const channel = i.channels.first()
 
-                        if (channel.id === result?.reactionChannelId) return await i.update({ content: `The reaction channel is already set to ${channel}.`, components, ephemeral: true })
+                        if (channel.id === result?.reactionChannelId) return await i.update({ content: 'Please choose a different channel.', components, ephemeral: true })
                         if (!channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) return await i.update({ content: `Please grant me the Manage Webhooks permission for ${channel}.`, components, ephemeral: true })
 
                         let webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
@@ -58,7 +57,7 @@ module.exports = {
                         }
 
                         await guildSchema.updateOne({ guildId }, { reactionChannelId: channel.id }, { upsert: true })
-                        await i.update({ content: `The reaction channel has been set to ${channel}.`, components, ephemeral: true })
+                        await i.update({ content: `The reaction log has been set to ${channel}.`, components, ephemeral: true })
                         break
                     }
                     case 'reaction_channel_cancel': {
@@ -68,19 +67,14 @@ module.exports = {
                     case 'reaction_channel_disable': {
                         const webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
 
-                        if (webhook) {
-                            if (webhook.channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) await webhook.delete()
+                        if (webhook && webhook.channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) await webhook.delete()
 
-                            await guildSchema.updateOne({ guildId }, { $unset: { reactionChannelWebhookId: '', reactionChannelWebhookToken: '' } })
-                        }
-                        
-                        await guildSchema.updateOne({ guildId }, { $unset: { reactionChannelId: '' } })
-                        await i.update({ content: `The reaction channel has been disabled.`, components, ephemeral: true })
+                        await guildSchema.updateOne({ guildId }, { $unset: { reactionChannelId: '', reactionChannelWebhookId: '', reactionChannelWebhookToken: '' } })
+                        await i.update({ content: `The reaction log has been disabled.`, components, ephemeral: true })
                         break
                     }
                 }
             }).catch(async (e) => {
-                console.log(e)
                 await interaction.editReply({ components })
             })
     },

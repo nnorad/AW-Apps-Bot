@@ -8,7 +8,7 @@ module.exports = {
 		.setDescription('Edit or get a suggestion, or set the suggestion channel.')
         .addSubcommand((subcommand) => subcommand
             .setName('channel')
-            .setDescription('Set the suggestion channel.'))
+            .setDescription('Set the channel to which suggestions will be sent.'))
         .addSubcommand((subcommand) => subcommand
             .setName('get')
             .setDescription('Get a suggestion.')
@@ -102,7 +102,7 @@ module.exports = {
                         )
                 ]
 
-                const message = await interaction.reply({ content: result?.suggestionChannelId ? `The suggestion channel is set to <#${result.suggestionChannelId}>.` : null, components, ephemeral: true })
+                const message = await interaction.reply({ content: result?.suggestionChannelId ? `Suggestion Channel: <#${result.suggestionChannelId}>` : null, components, ephemeral: true })
 
                 components.forEach((row) => row.components.forEach((component) => component.data.disabled = true))
 
@@ -112,7 +112,7 @@ module.exports = {
                             case 'suggestion_channel_select': {
                                 const channel = i.channels.first()
 
-                                if (channel.id === result?.suggestionChannelId) return await i.update({ content: `The suggestion channel is already set to ${channel}.`, components, ephemeral: true })
+                                if (channel.id === result?.suggestionChannelId) return await i.update({ content: 'Please select a different channel.', components, ephemeral: true })
 
                                 await guildSchema.updateOne({ guildId }, { suggestionChannelId: channel.id }, { upsert: true })
                                 await i.update({ content: `The suggestion channel has been set to ${channel}.`, components, ephemeral: true })
