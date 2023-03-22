@@ -15,18 +15,18 @@ module.exports = {
             new ActionRowBuilder()
                 .addComponents(
                     new ChannelSelectMenuBuilder()
-                        .setCustomId('reaction_channel_select')
+                        .setCustomId('reaction_log_select')
                         .setPlaceholder('Select a Channel')
                         .addChannelTypes(ChannelType.GuildText)
                 ),
             new ActionRowBuilder()
                 .addComponents(
                     new ButtonBuilder()
-                        .setCustomId('reaction_channel_cancel')
+                        .setCustomId('reaction_log_cancel')
                         .setLabel('Cancel')
                         .setStyle(ButtonStyle.Secondary),
                     new ButtonBuilder()
-                        .setCustomId('reaction_channel_disable')
+                        .setCustomId('reaction_log_disable')
                         .setLabel('Disable')
                         .setDisabled(result?.reactionChannelId ? false : true)
                         .setStyle(ButtonStyle.Danger)
@@ -40,7 +40,7 @@ module.exports = {
         await message.awaitMessageComponent({ time: 30000 })
             .then(async (i) => {
                 switch (i.customId) {
-                    case 'reaction_channel_select': {
+                    case 'reaction_log_select': {
                         const channel = i.channels.first()
 
                         if (channel.id === result?.reactionChannelId) return await i.update({ content: 'Please choose a different channel.', components, ephemeral: true })
@@ -60,11 +60,11 @@ module.exports = {
                         await i.update({ content: `The reaction log has been set to ${channel}.`, components, ephemeral: true })
                         break
                     }
-                    case 'reaction_channel_cancel': {
+                    case 'reaction_log_cancel': {
                         await i.update({ components })
                         break
                     }
-                    case 'reaction_channel_disable': {
+                    case 'reaction_log_disable': {
                         const webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
 
                         if (webhook && webhook.channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.ManageWebhooks)) await webhook.delete()
