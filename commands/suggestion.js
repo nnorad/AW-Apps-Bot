@@ -5,7 +5,7 @@ const guildSchema = require('../schemas/guild-schema')
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('suggestion')
-		.setDescription('Edit or get a suggestion, or set the suggestion channel.')
+		.setDescription('Manage suggestions.')
         .addSubcommand((subcommand) => subcommand
             .setName('channel')
             .setDescription('Set the channel to which suggestions will be sent.'))
