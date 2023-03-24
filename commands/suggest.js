@@ -50,6 +50,8 @@ module.exports = {
         const { guild, guildId, options, user } = interaction
         const result = await guildSchema.findOne({ guildId })
 
+        console.log(result)
+
         if (!result?.suggestionChannelId) return await interaction.reply({ content: 'Suggestions are disabled for this server.', ephemeral: true })
 
         const channel = guild.channels.cache.get(result?.suggestionChannelId)

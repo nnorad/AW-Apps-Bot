@@ -10,8 +10,16 @@ module.exports = {
         .setDMPermission(false),
 	async execute(interaction) {
         const { targetMessage: message, channel, guild } = interaction
+        const missingPermissions = channel.permissionsFor(guild.members.me).missing([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.AddReactions])
 
-        if (!channel.permissionsFor(guild.members.me).has(PermissionFlagsBits.AddReactions)) await interaction.reply({ content: `Please grant me the Add Reactions permission for this channel.`, ephemeral: true })
+        if (missingPermissions.length > 0) {
+            const permissions = {
+                'AddReactions': 'Add Reactions',
+                'ViewChannel': 'View Channels'
+            }
+      
+            return await interaction.reply({ content: `Please grant me these permissions in ${channel}:\n\n${missingPermissions.map(p => `• ${permissions[p]}`).join('\n')}`, ephemeral: true })
+        }
 
         await message.react('<:yes:1084332973870026892>')
         await message.react('<:no:1084332972683051068>')
