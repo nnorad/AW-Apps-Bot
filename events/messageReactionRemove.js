@@ -41,7 +41,7 @@ module.exports = {
             }
         } else {
             const result = await guildSchema.findOne({ guildId: message.guildId })
-            let webhook = await client.fetchWebhook(result?.reactionChannelWebhookId, result?.reactionChannelWebhookToken).catch(() => {})
+            let webhook = await client.fetchWebhook(result?.reactionLogWebhookId, result?.reactionLogWebhookToken).catch(() => {})
 
             if (!webhook) return
 
