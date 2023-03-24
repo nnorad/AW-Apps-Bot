@@ -52,7 +52,7 @@ module.exports = {
         const { guild, guildId, options, user } = interaction
         const result = await guildSchema.findOne({ guildId })
 
-        console.log(!result.suggestionChannelId)
+        console.log(!result?.suggestionChannelId, result?.suggestionChannelId)
 
         if (!result?.suggestionChannelId) return await interaction.editReply({ content: 'Suggestions are disabled for this server.' })
 
