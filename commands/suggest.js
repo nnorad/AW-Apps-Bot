@@ -47,18 +47,14 @@ module.exports = {
             .setDescription('An attachment to include with your suggestion.'))
         .setDMPermission(false),
 	async execute(interaction) {
-        await interaction.deferReply({ ephemeral: true })
-
         const { guild, guildId, options, user } = interaction
         const result = await guildSchema.findOne({ guildId })
 
-        console.log(!result?.suggestionChannelId, result?.suggestionChannelId)
-
-        if (!result?.suggestionChannelId) return await interaction.editReply({ content: 'Suggestions are disabled for this server.' })
+        if (!result?.suggestionChannelId) return await interaction.reply({ content: 'Suggestions are disabled for this server.', ephemeral: true })
 
         const channel = guild.channels.cache.get(result?.suggestionChannelId)
 
-        if (!channel) return await interaction.editReply({ content: 'The suggestion channel does not exist.' })
+        if (!channel) return await interaction.reply({ content: 'The suggestion channel does not exist.', ephemeral: true })
 
         const missingPermissions = channel.permissionsFor(guild.members.me).missing([PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.EmbedLinks, PermissionFlagsBits.AddReactions, PermissionFlagsBits.AttachFiles, PermissionFlagsBits.UseExternalEmojis])
 
@@ -72,7 +68,7 @@ module.exports = {
                 'UseExternalEmojis': 'UseExternalEmojis'
             }
       
-            return await interaction.editReply({ content: `Please grant me these permissions in ${channel}:\n\n${missingPermissions.map(p => `• ${permissions[p]}`).join('\n')}` })
+            return await interaction.reply({ content: `Please grant me these permissions in ${channel}:\n\n${missingPermissions.map(p => `• ${permissions[p]}`).join('\n')}`, ephemeral: true })
         }
 
         const suggestion = options.getString('suggestion')
@@ -103,6 +99,6 @@ module.exports = {
         await message.react('<:yes:1084332973870026892>')
         await message.react('<:no:1084332972683051068>')
         await suggestionSchema.create({ channelId: channel.id, files, guildId, messageId: message.id, suggestion, suggestionId, userId: user.id, status: 'NO_STATUS', title })
-        await interaction.editReply(`[Your suggestion](${message.url}) has been sent.`)
+        await interaction.reply(`[Your suggestion](${message.url}) has been sent.`)
     },
 }
